@@ -11,7 +11,7 @@
   <h3 align="center">Media Downloader</h3>
 
   <p align="center">
-    Baixe vídeo, áudio e GIF do YouTube, Twitter/X e Instagram direto pro seu PC — sem depender de sites online.
+    Baixe vídeo, áudio e GIF do YouTube, Twitter/X e Instagram direto pro seu PC, sem depender de sites online.
     <br />
     <a href="#usage"><strong>Ver como usar »</strong></a>
     <br />
@@ -55,7 +55,7 @@
 Media Downloader é uma ferramenta de linha de comando com menu interativo pra baixar vídeo, áudio (MP3) e GIF do YouTube, Twitter/X e Instagram, sem precisar de sites intermediários. Roda 100% localmente no Windows.
 
 Principais funcionalidades:
-- Menu interativo — sem precisar decorar comandos ou flags
+- Menu interativo, sem precisar decorar comandos ou flags
 - Suporte a vídeo (melhor qualidade ou escolhida), áudio MP3 e GIF
 - Pasta de destino configurável, perguntada apenas uma vez
 - Autenticação opcional via cookies pra contornar bloqueios do Twitter/X
@@ -67,9 +67,9 @@ Principais funcionalidades:
 <a id="built-with"></a>
 
 * [![Python][python-badge]][python-url]
-* [yt-dlp](https://github.com/yt-dlp/yt-dlp) — extração e download de mídia
-* [ffmpeg](https://ffmpeg.org) — conversão e merge de áudio/vídeo
-* [Deno](https://deno.com) — runtime JS exigido pelo yt-dlp para extração do YouTube
+* [yt-dlp](https://github.com/yt-dlp/yt-dlp): extração e download de mídia
+* [ffmpeg](https://ffmpeg.org): conversão e merge de áudio/vídeo
+* [Deno](https://deno.com): runtime JS exigido pelo yt-dlp para extração do YouTube
 
 <p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
@@ -90,7 +90,7 @@ Siga os passos abaixo para ter uma cópia local rodando.
 ### Instalação
 <a id="installation"></a>
 
-**Opção 1 — Setup automático (recomendado)**
+**Opção 1: Setup automático (recomendado)**
 
 1. Clone o repositório
    ```powershell
@@ -103,7 +103,7 @@ Siga os passos abaixo para ter uma cópia local rodando.
    O script instala Python, ffmpeg, Deno e `yt-dlp` automaticamente via `winget` e `pip`.
 3. Se algo foi instalado agora pela primeira vez, feche e reabra o terminal antes de continuar.
 
-**Opção 2 — Manual**
+**Opção 2: Manual**
 
 ```powershell
 pip install -r requirements.txt
@@ -121,7 +121,7 @@ Rode o programa a partir da pasta do projeto:
 python downloader.py
 ```
 
-Na primeira execução, o programa pergunta em qual pasta salvar os downloads e guarda essa resposta em `config.json` — não pergunta de novo depois disso.
+Na primeira execução, o programa pergunta em qual pasta salvar os downloads e guarda essa resposta em `config.json`. Não pergunta de novo depois disso.
 
 O menu principal apresenta as seguintes opções:
 
