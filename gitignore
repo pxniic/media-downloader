@@ -1,0 +1,12 @@
+# Nunca suba isso pro GitHub — são dados pessoais/sessão de login
+cookies.txt
+config.json
+
+# Lixo comum do Python
+__pycache__/
+*.pyc
+
+# Lixo comum do PyInstaller, se for gerar .exe
+build/
+dist/
+*.spec
