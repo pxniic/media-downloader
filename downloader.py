@@ -39,8 +39,8 @@ def _enable_ansi_windows():
 def banner():
     print(f"{C.CYAN}{C.BOLD}")
     print("╔════════════════════════════════════════════════╗")
-    print("║           DOWNLOADER — VÍDEOS / ÁUDIOS          ║")
-    print("║        YouTube · Twitter/X · Instagram          ║")
+    print("║           DOWNLOADER — VÍDEOS / ÁUDIOS         ║")
+    print("║        YouTube · Twitter/X · Instagram         ║")
     print("╚════════════════════════════════════════════════╝")
     print(C.RESET)
 
