@@ -1,123 +1,219 @@
-# Media Downloader
+<a id="readme-top"></a>
 
-A command-line tool for downloading video, audio, and GIF content from YouTube, Twitter/X, and Instagram. Runs locally on Windows with no dependency on external web services.
+<!-- PROJECT SHIELDS -->
+[![Python][python-shield]][python-url]
+[![License][license-shield]][license-url]
+[![Platform][platform-shield]][platform-url]
 
-![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <h3 align="center">Media Downloader</h3>
 
-## Features
+  <p align="center">
+    Baixe vídeo, áudio e GIF do YouTube, Twitter/X e Instagram direto pro seu PC — sem depender de sites online.
+    <br />
+    <a href="#usage"><strong>Ver como usar »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/pxniic/media-downloader/issues/new?labels=bug">Reportar Bug</a>
+    ·
+    <a href="https://github.com/pxniic/media-downloader/issues/new?labels=enhancement">Sugerir Funcionalidade</a>
+  </p>
+</div>
 
-- Downloads video, audio-only (MP3), and GIF content
-- Supports YouTube, Twitter/X, and Instagram URLs
-- Interactive menu interface with progress display
-- Configurable output directory, set once on first run
-- Optional cookie-based authentication for restricted content
-- Built on `yt-dlp` and `ffmpeg` for format extraction and conversion
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Sumário</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">Sobre o Projeto</a>
+      <ul>
+        <li><a href="#built-with">Construído com</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Como Começar</a>
+      <ul>
+        <li><a href="#prerequisites">Pré-requisitos</a></li>
+        <li><a href="#installation">Instalação</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Uso</a></li>
+    <li><a href="#twitter-authentication">Autenticação para Twitter/X</a></li>
+    <li><a href="#troubleshooting">Problemas Comuns</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contribuindo</a></li>
+    <li><a href="#license">Licença</a></li>
+  </ol>
+</details>
 
-## Requirements
+<!-- ABOUT THE PROJECT -->
+## Sobre o Projeto
+<a id="about-the-project"></a>
+
+Media Downloader é uma ferramenta de linha de comando com menu interativo pra baixar vídeo, áudio (MP3) e GIF do YouTube, Twitter/X e Instagram, sem precisar de sites intermediários. Roda 100% localmente no Windows.
+
+Principais funcionalidades:
+- Menu interativo — sem precisar decorar comandos ou flags
+- Suporte a vídeo (melhor qualidade ou escolhida), áudio MP3 e GIF
+- Pasta de destino configurável, perguntada apenas uma vez
+- Autenticação opcional via cookies pra contornar bloqueios do Twitter/X
+- Fallback automático de formato quando o serviço de origem muda a entrega de streams
+
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+
+### Construído com
+<a id="built-with"></a>
+
+* [![Python][python-badge]][python-url]
+* [yt-dlp](https://github.com/yt-dlp/yt-dlp) — extração e download de mídia
+* [ffmpeg](https://ffmpeg.org) — conversão e merge de áudio/vídeo
+* [Deno](https://deno.com) — runtime JS exigido pelo yt-dlp para extração do YouTube
+
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+
+<!-- GETTING STARTED -->
+## Como Começar
+<a id="getting-started"></a>
+
+Siga os passos abaixo para ter uma cópia local rodando.
+
+### Pré-requisitos
+<a id="prerequisites"></a>
 
 - Windows 10/11
-- Python 3.10 or later
-- ffmpeg
-- Deno (required by `yt-dlp` for YouTube's JavaScript-based signature verification)
+- [Python 3.10+](https://python.org/downloads) (marque "Add python.exe to PATH" no instalador)
+- [ffmpeg](https://ffmpeg.org)
+- [Deno](https://deno.com/install)
 
-## 📦 Installation
+### Instalação
+<a id="installation"></a>
 
-### Automated setup
+**Opção 1 — Setup automático (recomendado)**
 
-1. Clone or download this repository.
-2. Right-click `setup.ps1` and select **Run with PowerShell**.
-   If script execution is blocked, run the following in PowerShell first:
+1. Clone o repositório
    ```powershell
-   Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-   .\setup.ps1
+   git clone https://github.com/pxniic/media-downloader.git
    ```
-3. The script installs Python, ffmpeg, Deno, and `yt-dlp` via `winget` and `pip`.
-4. If any dependency was installed for the first time, close and reopen the terminal before proceeding.
+2. Abra o PowerShell dentro da pasta do projeto e rode o instalador
+   ```powershell
+   .\setup.bat
+   ```
+   O script instala Python, ffmpeg, Deno e `yt-dlp` automaticamente via `winget` e `pip`.
+3. Se algo foi instalado agora pela primeira vez, feche e reabra o terminal antes de continuar.
 
-### Manual setup
+**Opção 2 — Manual**
 
 ```powershell
-# Install Python 3.10+ from python.org, ensuring "Add python.exe to PATH" is checked
-
-# Install ffmpeg and add it to PATH
-# https://ffmpeg.org
-
-# Install Deno
-# https://deno.com/install
-
-# Install Python dependencies
 pip install -r requirements.txt
 ```
 
-## 🚀 Usage
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
-Run the script from the project directory:
+<!-- USAGE EXAMPLES -->
+## Uso
+<a id="usage"></a>
+
+Rode o programa a partir da pasta do projeto:
 
 ```powershell
 python downloader.py
 ```
 
-On first run, the program prompts for an output directory and stores it in `config.json`. Subsequent runs use this value automatically.
+Na primeira execução, o programa pergunta em qual pasta salvar os downloads e guarda essa resposta em `config.json` — não pergunta de novo depois disso.
 
-The main menu presents the following options:
+O menu principal apresenta as seguintes opções:
 
 ```
-1 - Video (best available quality)
-2 - Video (select quality)
-3 - Audio only (MP3)
+1 - Vídeo (melhor qualidade)
+2 - Vídeo (escolher qualidade)
+3 - Só áudio (mp3)
 4 - GIF
-0 - Exit
+0 - Sair
 ```
 
-Paste a URL when prompted and press Enter. After each download completes, the program asks whether to process another URL.
+Cole o link quando solicitado e aperte Enter. Ao final de cada download, o programa pergunta se você quer processar outro link.
 
-To change the output directory later, delete `config.json` and run the program again, or edit the file directly.
+Para trocar a pasta de destino depois, apague o `config.json` e rode o programa de novo, ou edite o arquivo diretamente.
 
-## Authentication for Twitter/X
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
-Twitter/X occasionally returns a "no video found" error for unauthenticated requests, even on public content. To resolve this:
+<!-- TWITTER AUTH -->
+## Autenticação para Twitter/X
+<a id="twitter-authentication"></a>
 
-1. Install a cookie export extension, such as **Get cookies.txt LOCALLY**, in your browser.
-2. Log in to x.com.
-3. With the X tab active, use the extension to export cookies for the domain.
-4. Rename the exported file to `cookies.txt`.
-5. Place `cookies.txt` in the same directory as `downloader.py`.
+O Twitter/X às vezes retorna erro de "vídeo não encontrado" para requisições não autenticadas, mesmo em conteúdo público. Para resolver:
 
-The program detects this file automatically and applies it to subsequent requests.
+1. Instale uma extensão de exportação de cookies, como **Get cookies.txt LOCALLY**, no seu navegador.
+2. Faça login no x.com.
+3. Com a aba do X ativa, use a extensão para exportar os cookies do domínio.
+4. Renomeie o arquivo exportado para `cookies.txt`.
+5. Coloque `cookies.txt` na mesma pasta do `downloader.py`.
 
-**Note:** `cookies.txt` contains an active session token for the account used to export it. Do not commit this file to version control or share it. The included `.gitignore` excludes it by default.
+O programa detecta esse arquivo automaticamente e passa a usá-lo nas próximas requisições.
 
-## Troubleshooting
+> **Atenção:** `cookies.txt` contém um token de sessão ativo da conta usada para exportá-lo. Não faça commit desse arquivo nem o compartilhe. O `.gitignore` incluído já exclui esse arquivo por padrão.
 
-| Issue | Resolution |
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+
+<!-- TROUBLESHOOTING -->
+## Problemas Comuns
+<a id="troubleshooting"></a>
+
+| Problema | Solução |
 |---|---|
-| `HTTP 403` error on YouTube downloads | Confirm Deno is installed: `deno --version` |
-| `yt-dlp` not found | Run `pip install -U yt-dlp` |
-| Twitter/X video not found | Configure cookie authentication (see above) |
-| `setup.ps1` fails to execute | PowerShell execution policy is restricting scripts; see the bypass command under Installation |
+| Erro `HTTP 403` em downloads do YouTube | Confirme que o Deno está instalado: `deno --version` |
+| `yt-dlp` não encontrado | Rode `pip install -U yt-dlp` |
+| Vídeo do Twitter/X não encontrado | Configure a autenticação por cookies (seção acima) |
+| `setup.bat` bloqueado pelo Controle de Aplicativos Inteligente | Rode `.\setup.bat` de dentro do PowerShell, em vez de dar duplo clique no arquivo |
+| `Requested format is not available` | O programa já tenta automaticamente um formato alternativo; se persistir, rode `pip install -U yt-dlp` |
 
-## Project structure
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
-```
-media-downloader/
-├── downloader.py       # Main application
-├── setup.ps1           # Automated dependency installer
-├── requirements.txt    # Python dependencies
-├── .gitignore           # Excludes cookies.txt and config.json from version control
-└── README.md
-```
+<!-- ROADMAP -->
+## Roadmap
+<a id="roadmap"></a>
 
-## Contributing
+- [x] Menu interativo
+- [x] Suporte a cookies para Twitter/X
+- [x] Fallback automático de formato
+- [ ] Suporte a corte de vídeo (via ffmpeg) integrado ao menu
+- [ ] Empacotamento em `.exe` assinado
 
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/description`).
-3. Commit your changes with a clear message.
-4. Open a pull request describing the change and its motivation.
+Veja as [issues abertas](https://github.com/pxniic/media-downloader/issues) para a lista completa de funcionalidades propostas e problemas conhecidos.
 
-Please avoid introducing new external dependencies without discussion, and keep the CLI interface consistent with the existing menu structure.
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
-## License
+<!-- CONTRIBUTING -->
+## Contribuindo
+<a id="contributing"></a>
 
-MIT
+Contribuições são o que tornam a comunidade open source um lugar incrível para aprender e criar. Qualquer contribuição é **muito bem-vinda**.
+
+Se você tiver uma sugestão, faça um fork do repositório e abra um pull request. Também pode abrir uma issue com a tag "enhancement".
+
+1. Faça um Fork do projeto
+2. Crie sua Feature Branch (`git checkout -b feature/MinhaFeature`)
+3. Faça o Commit das mudanças (`git commit -m 'Adiciona MinhaFeature'`)
+4. Faça o Push para a Branch (`git push origin feature/MinhaFeature`)
+5. Abra um Pull Request
+
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+
+<!-- LICENSE -->
+## Licença
+<a id="license"></a>
+
+Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
+
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[python-shield]: https://img.shields.io/badge/python-3.10%2B-blue
+[python-badge]: https://img.shields.io/badge/python-3.10%2B-blue
+[python-url]: https://python.org
+[license-shield]: https://img.shields.io/badge/license-MIT-green
+[license-url]: https://github.com/pxniic/media-downloader/blob/main/LICENSE
+[platform-shield]: https://img.shields.io/badge/platform-Windows-lightgrey
+[platform-url]: https://github.com/pxniic/media-downloader
