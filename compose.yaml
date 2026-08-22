@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  downloader:
+    build: .
+    image: localhost/media-downloader:local
+    container_name: media-downloader
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8765:8765"
+    volumes:
+      - ${HOME}/Músicas:/downloads:Z
+      - ${XDG_RUNTIME_DIR}/wayland-0:/tmp/wayland-0:ro
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "8765"
+      OUTPUT_DIR: /downloads
+      HOST_HOME: ${HOME}
+      NO_BROWSER: "1"
+      XDG_RUNTIME_DIR: /tmp
+      WAYLAND_DISPLAY: wayland-0

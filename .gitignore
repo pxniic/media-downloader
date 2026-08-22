@@ -1,12 +1,18 @@
-# Nunca suba isso pro GitHub — são dados pessoais/sessão de login
+# Dados pessoais — não versionar
 cookies.txt
 config.json
 
-# Lixo comum do Python
+# Ambiente local e cache Python
+.venv/
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+.pytest_cache/
 
-# Lixo comum do PyInstaller, se for gerar .exe
+# Build do exe (PyInstaller)
 build/
 dist/
-*.spec
+
+# Lixo de SO
+.DS_Store
+Thumbs.db

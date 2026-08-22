@@ -1,0 +1,9 @@
+.git
+.venv
+__pycache__
+*.pyc
+config.json
+cookies.txt
+README.md
+setup.bat
+gitignore
