@@ -13,6 +13,8 @@
   <p align="center">
     Baixe vídeo, áudio e GIF do YouTube, Twitter/X e Instagram direto pro seu PC, sem depender de sites online.
     <br />
+    Interface web local em <code>http://127.0.0.1:8765/</code> — no Linux e no Windows.
+    <br />
     <a href="#usage"><strong>Ver como usar »</strong></a>
     <br />
     <br />
@@ -36,7 +38,8 @@
       <a href="#getting-started">Como Começar</a>
       <ul>
         <li><a href="#prerequisites">Pré-requisitos</a></li>
-        <li><a href="#installation">Instalação</a></li>
+        <li><a href="#linux">Linux</a></li>
+        <li><a href="#windows">Windows (.exe)</a></li>
       </ul>
     </li>
     <li><a href="#usage">Uso</a></li>
@@ -52,14 +55,21 @@
 ## Sobre o Projeto
 <a id="about-the-project"></a>
 
-Media Downloader é uma ferramenta de linha de comando com menu interativo pra baixar vídeo, áudio (MP3) e GIF do YouTube, Twitter/X e Instagram, sem precisar de sites intermediários. Roda 100% localmente no Windows.
+Media Downloader baixa vídeo, áudio (MP3 320 kbps) e GIF do YouTube, Twitter/X e Instagram, sem sites intermediários. A interface principal é uma página local no navegador. O menu em terminal (`python downloader.py`) continua disponível.
+
+Dois jeitos de usar:
+
+- **Linux:** `python3 gui.py` ou container (Podman/Docker) em `http://127.0.0.1:8765/`
+- **Windows:** `MediaDownloader.exe` (PyInstaller), atalho no Menu Iniciar e início no login
 
 Principais funcionalidades:
-- Menu interativo, sem precisar decorar comandos ou flags
-- Suporte a vídeo (melhor qualidade ou escolhida), áudio MP3 e GIF
-- Pasta de destino configurável, perguntada apenas uma vez
-- Autenticação opcional via cookies pra contornar bloqueios do Twitter/X
-- Fallback automático de formato quando o serviço de origem muda a entrega de streams
+
+- Interface web com download (MP3 padrão) e playlist/player
+- Vídeo (melhor qualidade ou escolhida), áudio MP3 e GIF
+- Pasta padrão: Músicas do usuário no Linux, Music/Músicas no Windows (menu ⋮ para trocar)
+- Card **Adicionada** após o download (abre a playlist ou dá play)
+- Autenticação opcional via cookies para o Twitter/X
+- Capa embutida no MP3 (downloads novos) e controle de mídia do sistema (Media Session)
 
 <p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
@@ -77,37 +87,168 @@ Principais funcionalidades:
 ## Como Começar
 <a id="getting-started"></a>
 
-Siga os passos abaixo para ter uma cópia local rodando.
-
 ### Pré-requisitos
 <a id="prerequisites"></a>
 
-- Windows 10/11
-- [Python 3.10+](https://python.org/downloads) (marque "Add python.exe to PATH" no instalador)
+- [Python 3.10+](https://python.org/downloads)
 - [ffmpeg](https://ffmpeg.org)
 - [Deno](https://deno.com/install)
 
-### Instalação
-<a id="installation"></a>
+No Windows o instalador instala isso via `winget`. No Linux, use o gerenciador da distro.
 
-**Opção 1: Setup automático (recomendado)**
+---
 
-1. Clone o repositório
-   ```powershell
-   git clone https://github.com/pxniic/media-downloader.git
-   ```
-2. Abra o PowerShell dentro da pasta do projeto e rode o instalador
-   ```powershell
-   .\setup.bat
-   ```
-   O script instala Python, ffmpeg, Deno e `yt-dlp` automaticamente via `winget` e `pip`.
-3. Se algo foi instalado agora pela primeira vez, feche e reabra o terminal antes de continuar.
+## Linux
+<a id="linux"></a>
 
-**Opção 2: Manual**
+### Dependências
 
-```powershell
+```bash
+sudo apt update
+sudo apt install -y python3 python3-venv python3-pip ffmpeg
+# Deno: https://deno.com/install
+curl -fsSL https://deno.land/install.sh | sh
+```
+
+### Projeto e pacotes
+
+```bash
+cd media-downloader
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
+
+Se o sistema bloquear `pip` (PEP 668), use o `venv` — não instale no Python do sistema.
+
+### Configuração
+
+A pasta padrão é a de músicas do usuário atual:
+
+- Linux: `~/Músicas` (ou o caminho do `xdg-user-dir MUSIC`)
+- Windows: pasta Music/Músicas da conta
+
+Para trocar: na interface, três pontos no canto do card → **Pasta de download**. A escolha fica em `config.json` (não versionado). `~` é expandido automaticamente.
+
+No container, `~/Músicas` do host é montada em `/downloads`. A interface mostra o caminho do host; os arquivos saem nessa pasta.
+
+### Rodar a interface web
+
+```bash
+source .venv/bin/activate
+python3 gui.py
+```
+
+Abre [http://127.0.0.1:8765/](http://127.0.0.1:8765/). Deixe o terminal aberto. MP3 já vem selecionado.
+
+### Menu no terminal
+
+```bash
+python3 downloader.py
+```
+
+### Container (opcional, sobe no boot)
+
+Requer Podman ou Docker. A imagem inclui Python, `yt-dlp`, ffmpeg e Deno.
+
+```bash
+podman build -t localhost/media-downloader:local .
+mkdir -p "$HOME/Músicas"
+```
+
+**Compose:**
+
+```bash
+docker compose up -d --build
+```
+
+`~/Músicas` no host é montada em `/downloads` no container.
+
+**Início automático (Podman Quadlet + systemd do usuário):**
+
+```bash
+mkdir -p ~/.config/containers/systemd
+cp deploy/media-downloader.container ~/.config/containers/systemd/
+systemctl --user daemon-reload
+systemctl --user start media-downloader.service
+loginctl enable-linger "$USER"
+```
+
+```bash
+systemctl --user status media-downloader.service
+systemctl --user restart media-downloader.service
+```
+
+Depois de mudar o código:
+
+```bash
+podman build -t localhost/media-downloader:local .
+systemctl --user restart media-downloader.service
+```
+
+<p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+
+---
+
+## Windows (.exe)
+<a id="windows"></a>
+
+O `.exe` **precisa ser gerado no Windows**. Não dá para cross-compilar a partir do Linux.
+
+Python entra só na hora do build. No uso diário você abre o `MediaDownloader.exe`. ffmpeg e Deno continuam no sistema.
+
+### Pré-requisitos no PC Windows
+
+- Windows 10/11
+- [App Installer](https://apps.microsoft.com/detail/9nblggh4nns1) (traz o `winget`)
+- Clone ou copie este repositório
+
+Se a política de scripts bloquear o PowerShell:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+### Só gerar o exe
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\windows\build.ps1
+```
+
+O script instala PyInstaller e empacota `gui.py`, `downloader.py`, `web/` e `yt-dlp`.
+
+Arquivo gerado:
+
+```
+dist\MediaDownloader\MediaDownloader.exe
+```
+
+### Instalar (exe + atalho + início no login)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\windows\install.ps1
+```
+
+Ou dê dois cliques em `setup.bat`.
+
+O instalador:
+
+1. Instala Python 3.12, ffmpeg e Deno com `winget` (se faltar)
+2. Roda `windows\build.ps1`
+3. Copia o exe para `%LOCALAPPDATA%\MediaDownloader`
+4. Cria o atalho **Media Downloader** no Menu Iniciar
+5. Registra início automático no login
+6. Abre [http://127.0.0.1:8765/](http://127.0.0.1:8765/)
+
+Pasta padrão das músicas: `%USERPROFILE%\Music` (`config.json` em `%LOCALAPPDATA%\MediaDownloader`).
+
+### Desinstalar
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\MediaDownloader\uninstall.ps1"
+```
+
+Remove o app, o atalho e o início automático. Python, ffmpeg e Deno do sistema ficam.
 
 <p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
@@ -115,15 +256,18 @@ pip install -r requirements.txt
 ## Uso
 <a id="usage"></a>
 
-Rode o programa a partir da pasta do projeto:
+Abra [http://127.0.0.1:8765/](http://127.0.0.1:8765/) (via `gui.py` no Linux ou o exe no Windows).
 
-```powershell
-python downloader.py
+- Aba **Download:** cole o link e baixe (MP3, vídeo ou GIF)
+- Aba **Playlist:** lista as faixas (mais recentes primeiro) e o player
+- Menu ⋮: pasta de download
+- Card **Adicionada** (10 s): clique abre a Playlist; o play inicia a faixa
+
+O menu no terminal:
+
+```bash
+python3 downloader.py
 ```
-
-Na primeira execução, o programa pergunta em qual pasta salvar os downloads e guarda essa resposta em `config.json`. Não pergunta de novo depois disso.
-
-O menu principal apresenta as seguintes opções:
 
 ```
 1 - Vídeo (melhor qualidade)
@@ -133,9 +277,7 @@ O menu principal apresenta as seguintes opções:
 0 - Sair
 ```
 
-Cole o link quando solicitado e aperte Enter. Ao final de cada download, o programa pergunta se você quer processar outro link.
-
-Para trocar a pasta de destino depois, apague o `config.json` e rode o programa de novo, ou edite o arquivo diretamente.
+Para trocar a pasta de destino, use o menu ⋮ da interface (ou edite o `config.json`).
 
 <p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
@@ -143,17 +285,18 @@ Para trocar a pasta de destino depois, apague o `config.json` e rode o programa 
 ## Autenticação para Twitter/X
 <a id="twitter-authentication"></a>
 
-O Twitter/X às vezes retorna erro de "vídeo não encontrado" para requisições não autenticadas, mesmo em conteúdo público. Para resolver:
+O Twitter/X às vezes retorna “vídeo não encontrado” mesmo em post público. Para resolver:
 
-1. Instale uma extensão de exportação de cookies, como **Get cookies.txt LOCALLY**, no seu navegador.
-2. Faça login no x.com.
-3. Com a aba do X ativa, use a extensão para exportar os cookies do domínio.
-4. Renomeie o arquivo exportado para `cookies.txt`.
-5. Coloque `cookies.txt` na mesma pasta do `downloader.py`.
+1. Instale uma extensão tipo **Get cookies.txt LOCALLY**
+2. Faça login no x.com
+3. Exporte os cookies do domínio
+4. Renomeie para `cookies.txt`
+5. Coloque o arquivo:
+   - **Linux (Python):** ao lado de `downloader.py`
+   - **Linux (container):** monte em `/app/cookies.txt` ou copie para o projeto antes do build
+   - **Windows (exe):** em `%LOCALAPPDATA%\MediaDownloader\cookies.txt`
 
-O programa detecta esse arquivo automaticamente e passa a usá-lo nas próximas requisições.
-
-> **Atenção:** `cookies.txt` contém um token de sessão ativo da conta usada para exportá-lo. Não faça commit desse arquivo nem o compartilhe. O `.gitignore` incluído já exclui esse arquivo por padrão.
+> **Atenção:** `cookies.txt` contém um token de sessão ativo. Não faça commit nem compartilhe. O `.gitignore` já exclui esse arquivo e o `config.json`.
 
 <p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
@@ -163,11 +306,15 @@ O programa detecta esse arquivo automaticamente e passa a usá-lo nas próximas 
 
 | Problema | Solução |
 |---|---|
-| Erro `HTTP 403` em downloads do YouTube | Confirme que o Deno está instalado: `deno --version` |
-| `yt-dlp` não encontrado | Rode `pip install -U yt-dlp` |
-| Vídeo do Twitter/X não encontrado | Configure a autenticação por cookies (seção acima) |
-| `setup.bat` bloqueado pelo Controle de Aplicativos Inteligente | Rode `.\setup.bat` de dentro do PowerShell, em vez de dar duplo clique no arquivo |
-| `Requested format is not available` | O programa já tenta automaticamente um formato alternativo; se persistir, rode `pip install -U yt-dlp` |
+| Erro `HTTP 403` no YouTube | Confirme o Deno: `deno --version` |
+| `yt-dlp` não encontrado | `pip install -U yt-dlp` (ou regenere o exe) |
+| MP3/GIF falha no pós-processamento | Instale ffmpeg e deixe no PATH |
+| Vídeo do Twitter/X não encontrado | Configure `cookies.txt` |
+| Colar bloqueado no navegador | Ícone de colar ou Ctrl+V |
+| Porta 8765 em uso | O app tenta abrir a interface que já está rodando |
+| `setup.bat` bloqueado | Rode `.\setup.bat` no PowerShell, ou `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` |
+| `Requested format is not available` | Atualize o yt-dlp: `pip install -U yt-dlp` |
+| Exe não gera no Linux | O build do `.exe` só funciona no Windows |
 
 <p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
 
@@ -176,22 +323,45 @@ O programa detecta esse arquivo automaticamente e passa a usá-lo nas próximas 
 <a id="roadmap"></a>
 
 - [x] Menu interativo
+- [x] Interface web local
+- [x] Playlist e player
+- [x] Empacotamento em `.exe` (PyInstaller)
 - [x] Suporte a cookies para Twitter/X
 - [x] Fallback automático de formato
 - [ ] Suporte a corte de vídeo (via ffmpeg) integrado ao menu
 - [ ] Empacotamento em `.exe` assinado
 
-Veja as [issues abertas](https://github.com/pxniic/media-downloader/issues) para a lista completa de funcionalidades propostas e problemas conhecidos.
+Veja as [issues abertas](https://github.com/pxniic/media-downloader/issues) para a lista completa.
 
 <p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
+
+## Estrutura
+
+```
+media-downloader/
+├── downloader.py              # Download + menu no terminal
+├── gui.py                     # Servidor da interface web
+├── web/                       # HTML, CSS e JS
+├── requirements.txt           # yt-dlp
+├── MediaDownloader.spec       # PyInstaller (Windows)
+├── Dockerfile                 # Imagem Linux
+├── compose.yaml
+├── .dockerignore
+├── deploy/media-downloader.container
+├── windows/
+│   ├── build.ps1              # Gera o .exe
+│   ├── install.ps1            # Build + instala + inicia no login
+│   └── uninstall.ps1
+├── setup.bat                  # Atalho para install.ps1
+├── LICENSE
+└── README.md
+```
 
 <!-- CONTRIBUTING -->
 ## Contribuindo
 <a id="contributing"></a>
 
-Contribuições são o que tornam a comunidade open source um lugar incrível para aprender e criar. Qualquer contribuição é **muito bem-vinda**.
-
-Se você tiver uma sugestão, faça um fork do repositório e abra um pull request. Também pode abrir uma issue com a tag "enhancement".
+Contribuições são bem-vindas.
 
 1. Faça um Fork do projeto
 2. Crie sua Feature Branch (`git checkout -b feature/MinhaFeature`)
@@ -215,5 +385,5 @@ Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 [python-url]: https://python.org
 [license-shield]: https://img.shields.io/badge/license-MIT-green
 [license-url]: https://github.com/pxniic/media-downloader/blob/main/LICENSE
-[platform-shield]: https://img.shields.io/badge/platform-Windows-lightgrey
+[platform-shield]: https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey
 [platform-url]: https://github.com/pxniic/media-downloader

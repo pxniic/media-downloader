@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Downloader</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="stage">
+    <nav class="tabs" aria-label="Seções">
+      <button type="button" data-view="download" class="active" aria-label="Download" title="Download">
+        <i class="fa-solid fa-download"></i>
+      </button>
+      <button type="button" data-view="list" aria-label="Playlist" title="Playlist">
+        <i class="fa-solid fa-list"></i>
+      </button>
+    </nav>
+    <main>
+      <div class="menu">
+        <button id="menu-btn" type="button" aria-label="Configurações" title="Configurações" aria-expanded="false" aria-controls="menu-panel">
+          <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+        <div id="menu-panel" class="menu-panel" hidden>
+          <button type="button" id="folder-option" class="menu-item">
+            <i class="fa-solid fa-folder-open"></i>
+            <span>
+              <strong>Pasta de download</strong>
+              <small id="folder-path">Carregando…</small>
+            </span>
+          </button>
+          <form id="folder-form" class="folder-form" hidden>
+            <label for="folder-input">Caminho da pasta</label>
+            <input id="folder-input" type="text" autocomplete="off" spellcheck="false">
+            <button type="submit">Salvar</button>
+            <p id="folder-error"></p>
+          </form>
+        </div>
+      </div>
+      <h1 id="view-title">Download</h1>
+
+      <div class="views">
+        <section id="view-download">
+          <div class="formats" role="radiogroup" aria-label="Formato">
+            <label>
+              <input type="radio" name="fmt" value="mp3" checked>
+              <span>MP3</span>
+            </label>
+            <label>
+              <input type="radio" name="fmt" value="video">
+              <span>Vídeo</span>
+            </label>
+            <label>
+              <input type="radio" name="fmt" value="gif">
+              <span>GIF</span>
+            </label>
+          </div>
+
+          <div class="url-row">
+            <div class="url-field">
+              <input id="manual" type="url" placeholder="Cole o link aqui" autocomplete="off" spellcheck="false">
+              <button id="clear" type="button" aria-label="Limpar" title="Limpar" hidden>
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <button id="paste" type="button" aria-label="Colar" title="Colar">
+              <i class="fa-regular fa-paste"></i>
+            </button>
+          </div>
+          <button id="go" type="button">Baixar</button>
+          <p id="status"></p>
+        </section>
+
+        <section id="view-list" class="is-hidden">
+          <div class="playlist">
+            <ul id="library"></ul>
+            <p id="library-empty">Nenhuma música ainda.</p>
+          </div>
+          <div class="player">
+            <div class="player-art-wrap">
+              <i class="fa-solid fa-music"></i>
+              <img id="player-art" alt="">
+            </div>
+            <div class="player-main">
+            <div class="player-top">
+              <button id="prev" type="button" aria-label="Anterior" title="Anterior">
+                <i class="fa-solid fa-backward-step"></i>
+              </button>
+              <button id="play" type="button" aria-label="Reproduzir" title="Reproduzir">
+                <i class="fa-solid fa-play"></i>
+              </button>
+              <button id="next" type="button" aria-label="Próxima" title="Próxima">
+                <i class="fa-solid fa-forward-step"></i>
+              </button>
+              <button id="shuffle" type="button" aria-label="Aleatório" title="Aleatório">
+                <i class="fa-solid fa-shuffle"></i>
+              </button>
+              <div class="player-meta">
+                <p id="player-title">Selecione uma faixa</p>
+                <p id="player-artist"></p>
+              </div>
+            </div>
+            <div class="seek-row">
+              <span id="time-elapsed">0:00</span>
+              <input id="seek" type="range" min="0" max="100" value="0" step="0.1">
+              <span id="time-left">-0:00</span>
+            </div>
+            </div>
+          </div>
+          <audio id="audio" preload="none"></audio>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast">
+    <img id="toast-art" alt="">
+    <div class="toast-body">
+      <p class="toast-kicker">Adicionada</p>
+      <p id="toast-title" class="toast-title"></p>
+      <p id="toast-artist" class="toast-artist"></p>
+    </div>
+    <button id="toast-play" type="button" aria-label="Reproduzir" title="Reproduzir">
+      <i class="fa-solid fa-play"></i>
+    </button>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

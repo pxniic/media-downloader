@@ -1,0 +1,24 @@
+[Unit]
+Description=Media Downloader (interface HTML local)
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=localhost/media-downloader:local
+ContainerName=media-downloader
+PublishPort=127.0.0.1:8765:8765
+Volume=%h/Músicas:/downloads:Z
+Volume=%t/wayland-0:/tmp/wayland-0:ro
+Environment=HOST=0.0.0.0
+Environment=PORT=8765
+Environment=OUTPUT_DIR=/downloads
+Environment=HOST_HOME=%h
+Environment=NO_BROWSER=1
+Environment=XDG_RUNTIME_DIR=/tmp
+Environment=WAYLAND_DISPLAY=wayland-0
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
