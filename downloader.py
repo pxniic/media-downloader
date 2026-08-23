@@ -39,8 +39,8 @@ def _enable_ansi_windows():
 def banner():
     print(f"{C.CYAN}{C.BOLD}")
     print("╔════════════════════════════════════════════════╗")
-    print("║           DOWNLOADER — VÍDEOS / ÁUDIOS          ║")
-    print("║        YouTube · Twitter/X · Instagram          ║")
+    print("║          DOWNLOADER — VÍDEOS / ÁUDIOS          ║")
+    print("║        YouTube · Twitter/X · Instagram         ║")
     print("╚════════════════════════════════════════════════╝")
     print(C.RESET)
 
@@ -230,10 +230,6 @@ def main():
     if config is None:
         config = setup_wizard()
     output_dir = config["output_dir"]
-
-    if not COOKIES_FILE.exists():
-        print(f"{C.GRAY}(dica: se for baixar do Twitter/X, coloque um arquivo 'cookies.txt' "
-              f"nesta mesma pasta pra evitar erro de vídeo não encontrado — veja o README){C.RESET}\n")
 
     while True:
         choice = menu()
