@@ -11,7 +11,7 @@ from pathlib import Path
 try:
     import yt_dlp
 except ImportError:
-    print("✘ Erro: yt-dlp não encontrado. Rode o setup.ps1 ou: pip install yt-dlp")
+    print("✘ Erro: yt-dlp não encontrado. Rode o setup.bat ou: pip install yt-dlp")
     input("\nPressione Enter para sair...")
     sys.exit(1)
 
@@ -39,8 +39,8 @@ def _enable_ansi_windows():
 def banner():
     print(f"{C.CYAN}{C.BOLD}")
     print("╔════════════════════════════════════════════════╗")
-    print("║           DOWNLOADER — VÍDEOS / ÁUDIOS         ║")
-    print("║        YouTube · Twitter/X · Instagram         ║")
+    print("║           DOWNLOADER — VÍDEOS / ÁUDIOS          ║")
+    print("║        YouTube · Twitter/X · Instagram          ║")
     print("╚════════════════════════════════════════════════╝")
     print(C.RESET)
 
@@ -113,6 +113,46 @@ def build_format_string(choice, quality=None):
     return "bestvideo+bestaudio/best"
 
 
+_browser_cookies_cache = {"checked": False, "browser": None}
+
+
+class _SilentLogger:
+    def debug(self, msg): pass
+    def warning(self, msg): pass
+    def error(self, msg): pass
+
+
+def get_browser_cookies():
+    """Tenta usar os cookies de sessão já logada em algum navegador instalado.
+    Testa em ordem e usa o primeiro que funcionar de verdade — muitos navegadores
+    modernos (Chrome/Edge/Brave) bloqueiam esse acesso por segurança (App-Bound
+    Encryption), então isso normalmente vai falhar neles e cair pro cookies.txt manual.
+    Resultado é testado só uma vez por execução do programa."""
+    if _browser_cookies_cache["checked"]:
+        return _browser_cookies_cache["browser"]
+
+    browsers = ["chrome", "edge", "brave", "firefox"]
+
+    for browser in browsers:
+        try:
+            with yt_dlp.YoutubeDL({
+                "cookiesfrombrowser": (browser,),
+                "quiet": True,
+                "no_warnings": True,
+                "logger": _SilentLogger(),
+            }) as ydl:
+                ydl.cookiejar
+            _browser_cookies_cache["checked"] = True
+            _browser_cookies_cache["browser"] = browser
+            return browser
+        except Exception:
+            continue
+
+    _browser_cookies_cache["checked"] = True
+    _browser_cookies_cache["browser"] = None
+    return None
+
+
 def build_opts(output_dir, choice, quality=None):
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     outtmpl = os.path.join(output_dir, "%(extractor)s - %(title).80s.%(ext)s")
@@ -125,7 +165,7 @@ def build_opts(output_dir, choice, quality=None):
         "no_warnings": True,
         "merge_output_format": "mp4",
         "noplaylist": True,
-        "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+        "extractor_args": {"youtube": {"player_client": ["web", "android"]}},
     }
 
     if choice == "3":
@@ -141,10 +181,16 @@ def build_opts(output_dir, choice, quality=None):
             "preferedformat": "gif",
         }]
 
-    if COOKIES_FILE.exists():
+    # tenta cookies do navegador primeiro; se nenhum funcionar, usa cookies.txt manual
+    browser = get_browser_cookies()
+    if browser:
+        opts["cookiesfrombrowser"] = (browser,)
+    elif COOKIES_FILE.exists():
         opts["cookiefile"] = str(COOKIES_FILE)
 
     return opts
+
+
 
 
 def baixar(output_dir, url, choice, quality=None):
@@ -153,8 +199,25 @@ def baixar(output_dir, url, choice, quality=None):
         with yt_dlp.YoutubeDL(opts) as ydl:
             ydl.download([url])
         print(f"\n{C.GREEN}{C.BOLD}🎉 Download concluído! Salvo em: {output_dir}{C.RESET}\n")
+        return
     except yt_dlp.utils.DownloadError as e:
-        print(f"\n{C.RED}✘ Erro ao baixar: {e}{C.RESET}\n")
+        if "Requested format is not available" not in str(e):
+            print(f"\n{C.RED}✘ Erro ao baixar: {e}{C.RESET}\n")
+            return
+    except KeyboardInterrupt:
+        print(f"\n{C.YELLOW}✘ Cancelado.{C.RESET}\n")
+        return
+
+    # plano B: o YouTube às vezes derruba os formatos separados de áudio/vídeo
+    # (experimento SABR) — tenta de novo com o formato combinado mais simples
+    print(f"{C.YELLOW}⚠ Formato preferido indisponível, tentando alternativa...{C.RESET}")
+    opts["format"] = "best"
+    try:
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            ydl.download([url])
+        print(f"\n{C.GREEN}{C.BOLD}🎉 Download concluído! Salvo em: {output_dir}{C.RESET}\n")
+    except yt_dlp.utils.DownloadError as e:
+        print(f"\n{C.RED}✘ Erro ao baixar (mesmo com alternativa): {e}{C.RESET}\n")
     except KeyboardInterrupt:
         print(f"\n{C.YELLOW}✘ Cancelado.{C.RESET}\n")
 
